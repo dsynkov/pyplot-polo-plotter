@@ -1,0 +1,6 @@
+*.localenv
+*.ipynb
+.ipynb_checkpoints/
+__pycache__/
+mpl_finance.py
+README.ipynb
