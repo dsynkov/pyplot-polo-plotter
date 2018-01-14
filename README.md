@@ -25,7 +25,7 @@ poloplt.plot_coin('BTC_XRP',1800,'2017-12-28 12:00:00','2017-12-31 12:00:00')
 ```
 
 
-![png](README_files/README_5_0.png)
+![png](images/sample1.png)
 
 
 ### Plot Multiple Coins
@@ -44,17 +44,17 @@ for coin in list_of_coins:
 ```
 
 
-![png](README_files/README_7_0.png)
+![png](images/sample2a.png)
 
 
 
-![png](README_files/README_7_1.png)
+![png](images/sample2b.png)
 
 
 
-![png](README_files/README_7_2.png)
+![png](images/sample2c.png)
 
 
 
-![png](README_files/README_7_3.png)
+![png](images/sample2d.png)
 
