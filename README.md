@@ -15,7 +15,9 @@ An altcoin charting module using the Poloniex API I put together while following
 import poloplotter as poloplt
 ```
 
-The `plot_coin()` method follows the same structure as the [Poloniex API](https://m.poloniex.com/support/api/)'s `returnChartData` method, accepting a currency paid, candlestick period (300, 900, 1800, 7200, 14400, or 86400), start and end. 
+The `plot_coin()` method follows the same structure as the [Poloniex API](https://m.poloniex.com/support/api/)'s `returnChartData` method, accepting a currency pair, candlestick period (300, 900, 1800, 7200, 14400, or 86400), start and end. 
+
+Use the `%Y-%m-%d %H:%M:%S` format for the starting and ending datetimes. (These will be converted to Unix timestamps per the Poloniex API's requirements.)
 
 ### Plot a Single Coin
 
