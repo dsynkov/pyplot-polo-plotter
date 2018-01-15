@@ -62,7 +62,9 @@ def ohlc_to_dict(chart_data):
         'date': np.asarray(date_list),
         'high': np.asarray(high_list)
     }
-                    
+    
+    OHLC_dict['date'] = mdates.date2num(OHLC_dict['date'])
+    
     return OHLC_dict
 
 def get_coin_data(pair,period,start,end):
@@ -105,7 +107,7 @@ def get_rsi(prices, n=14):
     rsi[:n] = 100. - 100./(1.+rs)
 
     for i in range(n, len(prices)):
-        delta = deltas[i-1] # cause the diff is 1 shorter
+        delta = deltas[i-1]
 
         if delta>0:
             upval = delta
@@ -122,44 +124,44 @@ def get_rsi(prices, n=14):
 
     return rsi, n
 
-def get_candle_array(date,coin):
+def get_candle_array(coin):
     
     x = 0
-    y = len(date)
+    y = len(coin['date'])
 
     candle_array = []
     while x < y:
-        append_line = date[x],coin['open'][x],coin['close'][x],coin['high'][x],coin['low'][x],coin['volume'][x]
+        append_line = coin['date'][x],coin['open'][x],coin['close'][x],coin['high'][x],coin['low'][x],coin['volume'][x]
         candle_array.append(append_line)
         x +=1 
         
     return candle_array
 
-def local_max_min(coin,date):
+def local_max_min(coin):
     
     y_max = max(coin['close'])
     x_max_pos = list(coin['close']).index(y_max)
-    x_max = date[x_max_pos]
+    x_max = coin['date'][x_max_pos]
     
     y_min = min(coin['close'])
     x_min_pos = list(coin['close']).index(y_min)
-    x_min = date[x_min_pos]   
+    x_min = coin['date'][x_min_pos]   
     
     y_max, y_min = f'{y_max:.8f}', f'{y_min:.8f}'
     
     return x_max, y_max, x_min, y_min
 
-def last_price(coin,date):
+def last_price(coin):
     
     y_last = coin['close'][-1]
     x_last_pos = list(coin['close']).index(y_last) - 1
-    x_last = date[x_last_pos]
+    x_last = coin['date'][x_last_pos]
     
     y_last = f'{y_last:.8f}'
     
     return x_last, y_last
 
-def volume_pos_neg(coin,date):
+def volume_pos_neg(coin):
     
     pos = coin['open'] - coin['close'] < 0
     neg = coin['open'] - coin['close'] > 0
@@ -177,9 +179,6 @@ def plot_coin(pair,period,start,end):
     
     # Retrive coin data from Polo API
     coin = get_coin_data(pair,period,start,end)
-    
-    # Convert to plt-readable date
-    date = mdates.date2num(coin['date'])
     
     # Set the plot style 
     plt.style.use('classic')
@@ -207,8 +206,8 @@ def plot_coin(pair,period,start,end):
     ax1.grid(True,color='w')
     
     # Annotate lowest and highest
-    x_max, y_max, x_min, y_min = local_max_min(coin,date)
-    x_last, y_last = last_price(coin,date)
+    x_max, y_max, x_min, y_min = local_max_min(coin)
+    x_last, y_last = last_price(coin)
     
     ax1.annotate(y_max, xy=(x_max, y_max),va='top',ha='left',clip_on=True,color='w')
     ax1.annotate(y_min, xy=(x_min, y_min),va='bottom',ha='left',clip_on=True,color='w')
@@ -217,10 +216,10 @@ def plot_coin(pair,period,start,end):
     """VOLUME SUBPLOT"""
 
     volume_min = coin['volume'].min()
-    pos, neg = volume_pos_neg(coin,date)
+    pos, neg = volume_pos_neg(coin)
     ax2 = plt.subplot2grid((7,4), (5,0), sharex=ax1, rowspan=1, colspan=4, facecolor = bg_color)
-    ax2.bar(date[pos],coin['volume'][pos],color='g',width=bar_width,align='center')
-    ax2.bar(date[neg],coin['volume'][neg],color='r',width=bar_width,align='center')
+    ax2.bar(coin['date'][pos],coin['volume'][pos],color='g',width=bar_width,align='center')
+    ax2.bar(coin['date'][neg],coin['volume'][neg],color='r',width=bar_width,align='center')
     ax2.yaxis.label.set_color('w')
     ax2.spines['bottom'].set_color('w') 
     ax2.spines['top'].set_color('w') 
@@ -243,10 +242,10 @@ def plot_coin(pair,period,start,end):
     ema9 = exp_moving_average(macd) # Default window is 9
     macd_pos, macd_neg = macd_pos_neg(macd,ema9) 
     
-    ax3.plot(date,macd, color = 'yellow', lw=2)
-    ax3.plot(date,ema9, color = '#EE82EE', lw=1)
-    ax3.bar(date[macd_pos],(macd-ema9)[macd_pos], color='red',width=bar_width,align='center')
-    ax3.bar(date[macd_neg],(macd-ema9)[macd_neg], color='green',width=bar_width,align='center')
+    ax3.plot(coin['date'],macd, color = 'yellow', lw=2)
+    ax3.plot(coin['date'],ema9, color = '#EE82EE', lw=1)
+    ax3.bar(coin['date'][macd_pos],(macd-ema9)[macd_pos], color='red',width=bar_width,align='center')
+    ax3.bar(coin['date'][macd_neg],(macd-ema9)[macd_neg], color='green',width=bar_width,align='center')
     ax3.spines['bottom'].set_color('w') 
     ax3.spines['top'].set_color('w') 
     ax3.spines['left'].set_color('w') 
@@ -274,11 +273,11 @@ def plot_coin(pair,period,start,end):
     
     # Configure plot
     ax0 = plt.subplot2grid((7,4), (0,0), sharex=ax1, rowspan=1, colspan=4, facecolor=bg_color)
-    ax0.plot(date,rsi,rsi_color,linewidth=1.5)
+    ax0.plot(coin['date'],rsi,rsi_color,linewidth=1.5)
     ax0.axhline(70, color = rsi_neg_color) # Upper bound RSI 
     ax0.axhline(30, color = rsi_pos_color) # Lower bound RSI
-    ax0.fill_between(date,rsi,70,where=(rsi>=70),facecolor=rsi_neg_color,edgecolor=rsi_neg_color)
-    ax0.fill_between(date,rsi,30,where=(rsi<=30),facecolor=rsi_pos_color,edgecolor=rsi_pos_color)
+    ax0.fill_between(coin['date'],rsi,70,where=(rsi>=70),facecolor=rsi_neg_color,edgecolor=rsi_neg_color)
+    ax0.fill_between(coin['date'],rsi,30,where=(rsi<=30),facecolor=rsi_pos_color,edgecolor=rsi_pos_color)
     ax0.spines['bottom'].set_color('w') 
     ax0.spines['top'].set_color('w') 
     ax0.spines['left'].set_color('w') 
@@ -293,7 +292,7 @@ def plot_coin(pair,period,start,end):
     
     """CANDLESTICK"""
     
-    mpl.candlestick_ochl(ax1,get_candle_array(date,coin),width=candle_width,colorup='g',colordown='r') 
+    mpl.candlestick_ochl(ax1,get_candle_array(coin),width=candle_width,colorup='g',colordown='r') 
     
     """FORMATTING"""  
     
@@ -316,6 +315,6 @@ def plot_coin(pair,period,start,end):
     ax3.yaxis.set_ticks_position('right')
     
     # Set the x-axis limits; fig size
-    plt.xlim(date[0],max(date))
+    plt.xlim(coin['date'][0],max(coin['date']))
     fig.set_size_inches(20,7.5)
     plt.show()
