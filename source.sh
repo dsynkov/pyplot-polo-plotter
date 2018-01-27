@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-export POLO_KEY='YOUR POLO_KEY HERE'
-export POLO_SECRET='YOUR POLO SECRET HERE'
