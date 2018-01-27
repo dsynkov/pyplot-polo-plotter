@@ -19,6 +19,8 @@ The `plot_coin()` method follows the same structure as the [Poloniex API](https:
 
 Use the `%Y-%m-%d %H:%M:%S` format for the starting and ending datetimes. (These will be converted to Unix timestamps per the Poloniex API's requirements.)
 
+To save an image, set `export` to `True`. This will save the output visualization to the `/exports` sub-directory as a `.png`, naming the file after the currency pair.
+
 ### Plot a Single Coin
 
 

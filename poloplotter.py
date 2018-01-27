@@ -3,6 +3,7 @@ import time
 import numpy as np
 from datetime import datetime 
 from poloniex import Poloniex
+import pathlib
 
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -19,6 +20,14 @@ def to_timestamp(string, fmt="%Y-%m-%d %H:%M:%S"):
     dt = datetime.strptime(string, fmt)
     t_tuple = dt.timetuple()
     return int(time.mktime(t_tuple))
+
+
+def get_export_filename(pair):
+    path = pathlib.PurePath(os.getcwd())
+    name = pair + '_' + str(int(datetime.now().timestamp()))
+    file_name = path / 'exports' / (name + '.png')
+
+    return str(file_name)
 
 
 def get_historical_data(pair, period, start, end):
@@ -329,6 +338,7 @@ def plot_coin(pair, period, start, end, export=False):
 
     # Save figure if desired
     if export:
-        fig.savefig(title + '.png', facecolor=fig.get_facecolor())
+        file_name = get_export_filename(pair)
+        fig.savefig(file_name, facecolor=fig.get_facecolor())
 
     plt.show()
