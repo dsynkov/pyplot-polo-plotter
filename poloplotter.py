@@ -184,7 +184,7 @@ def macd_pos_neg(macd, ema9):
     return pos, neg
 
 
-def plot_coin(pair, period, start, end):
+def plot_coin(pair, period, start, end, export=False):
     
     # Retrieve coin data from Polo API
     coin = get_coin_data(pair, period, start, end)
@@ -308,7 +308,8 @@ def plot_coin(pair, period, start, end):
     plt.subplots_adjust(left=.09, bottom=.18, right=.94, top=.95, wspace=.20, hspace=0)
         
     # Add labels and title
-    plt.suptitle("%s from %s to %s" % (pair, start, end), color='w')
+    title = "%s from %s to %s" % (pair, start, end)
+    plt.suptitle(title, color='w')
     
     # Make unwanted axes invisible
     plt.setp(ax0.get_xticklabels(), visible=False)
@@ -325,4 +326,9 @@ def plot_coin(pair, period, start, end):
     # Set the x-axis limits; fig size
     plt.xlim(coin['date'][0], max(coin['date']))
     fig.set_size_inches(20, 7.5)
+
+    # Save figure if desired
+    if export:
+        fig.savefig(title + '.png', facecolor=fig.get_facecolor())
+
     plt.show()
